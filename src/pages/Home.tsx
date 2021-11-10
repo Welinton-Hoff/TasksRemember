@@ -9,6 +9,11 @@ import { Header } from '../components/Header'
 import { Task, TasksList } from '../components/TasksList'
 import { TodoInput } from '../components/TodoInput'
 
+export type EditTaskArgs = {
+  taskId: number;
+  taskNewTitle: string;
+}
+
 export function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
 
@@ -35,6 +40,7 @@ export function Home() {
     if (!foundItem) return
     else {
       foundItem.done = !foundItem.done
+
       setTasks(updatedTasks)
     }
 
@@ -42,16 +48,34 @@ export function Home() {
   }
 
   function handleRemoveTask(id: number) {
-    //TODO - remove task from state
     Alert.alert(
       'Remover item',
       'Tem certeza que você deseja remover esse item?',
       [
-        { text: 'Sim', onPress: () => setTasks(oldState => oldState.filter(skill => skill.id !== id)) },
+        {
+          text: 'Sim', onPress: () => {
+            const updatedTasks = tasks.filter(skill => skill.id !== id)
+
+            setTasks(updatedTasks)
+          }
+        },
         { text: 'Não' },
       ],
       { cancelable: false }
     )
+  }
+
+  function handleEditTask({ taskId, taskNewTitle }: EditTaskArgs) {
+    const updatedTasks = tasks.map(task => ({ ...task }))
+    const foundTaskToUpdate = updatedTasks.find(item => item.id === taskId)
+
+    if (!foundTaskToUpdate) return
+    else {
+      foundTaskToUpdate.title = taskNewTitle
+
+      setTasks(updatedTasks)
+    }
+
   }
 
   return (
@@ -64,6 +88,7 @@ export function Home() {
         tasks={tasks}
         toggleTaskDone={handleToggleTaskDone}
         removeTask={handleRemoveTask}
+        editTask={handleEditTask}
       />
     </View>
   )
